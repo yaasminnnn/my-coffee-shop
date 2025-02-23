@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Orders</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>My Orders</h1>
+    <button id="back-btn">Back to Store</button>
+  </header>
+  <main>
+    <section>
+      <div id="loading" style="text-align: center; display: none;">Loading orders...</div>
+      <div id="error-message" style="text-align: center; color: red; display: none;"></div>
+      <table id="orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Date</th>
+            <th class="admin-only" style="display: none;">Customer</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="orders-tbody">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/js/orders.js"></script>
+</body>
+</html>
