@@ -1,9 +1,6 @@
-const express = require('express');
-const router = express.Router();
 const Order = require('../models/Order');
-const { auth, adminOnly } = require('../middleware/auth');
 
-router.get('/sales', auth, adminOnly, async (req, res, next) => {
+exports.getSalesAnalytics = async (req, res, next) => {
   try {
     const analytics = await Order.aggregate([
       { $unwind: "$items" },
@@ -16,7 +13,7 @@ router.get('/sales', auth, adminOnly, async (req, res, next) => {
       },
       {
         $lookup: {
-          from: "products", 
+          from: "products",
           localField: "_id",
           foreignField: "_id",
           as: "productDetails"
@@ -31,10 +28,9 @@ router.get('/sales', auth, adminOnly, async (req, res, next) => {
         }
       }
     ]);
+
     res.json(analytics);
   } catch (err) {
     next(err);
   }
-});
-
-module.exports = router;
+};

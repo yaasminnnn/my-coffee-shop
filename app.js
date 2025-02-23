@@ -19,10 +19,10 @@ app.use(securityMiddleware);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const productRoutes = require('./controllers/productController');
-const orderRoutes = require('./controllers/orderController');
-const userRoutes = require('./controllers/userController');
-const analyticsRoutes = require('./controllers/analyticsController');
+const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const userRoutes = require('./routes/userRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);

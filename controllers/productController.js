@@ -1,9 +1,6 @@
-const express = require('express');
-const router = express.Router();
 const Product = require('../models/Product');
-const { auth, adminOnly } = require('../middleware/auth');
 
-router.get('/', async (req, res, next) => {
+exports.getProducts = async (req, res, next) => {
   try {
     const { search } = req.query;
     let query = {};
@@ -15,9 +12,21 @@ router.get('/', async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-router.post('/', auth, adminOnly, async (req, res, next) => {
+exports.getProductById = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json(product);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.createProduct = async (req, res, next) => {
   try {
     const { name, description, price, imageUrl, category } = req.body;
     const newProduct = new Product({ name, description, price, imageUrl, category });
@@ -26,24 +35,22 @@ router.post('/', auth, adminOnly, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+};
 
-router.put('/:id', auth, adminOnly, async (req, res, next) => {
+exports.updateProduct = async (req, res, next) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(updatedProduct);
   } catch (err) {
     next(err);
   }
-});
+};
 
-router.delete('/:id', auth, adminOnly, async (req, res, next) => {
+exports.deleteProduct = async (req, res, next) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
     res.json({ message: 'Product deleted' });
   } catch (err) {
     next(err);
   }
-});
-
-module.exports = router;
+};

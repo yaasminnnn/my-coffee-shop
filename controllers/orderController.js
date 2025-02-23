@@ -1,23 +1,20 @@
-const express = require('express');
-const router = express.Router();
 const Order = require('../models/Order');
 const Product = require('../models/Product');
-const { auth } = require('../middleware/auth');
 
-router.get('/', auth, async (req, res) => {
+exports.getOrders = async (req, res) => {
   try {
     console.log('Fetching orders for user:', req.user.id);
     console.log('User role:', req.user.role);
-    
+
     const query = req.user.role === 'admin' ? {} : { user: req.user.id };
-    
+
     const orders = await Order.find(query)
       .populate('items.product')
       .populate('user', 'username email')
       .sort({ createdAt: -1 });
 
     console.log(`Found ${orders.length} orders`);
-    
+
     const transformedOrders = orders.map(order => ({
       _id: order._id,
       createdAt: order.createdAt,
@@ -41,12 +38,12 @@ router.get('/', auth, async (req, res) => {
     console.error('Error fetching orders:', error);
     res.status(500).json({ error: 'Error fetching orders' });
   }
-});
+};
 
-router.post('/', auth, async (req, res) => {
+exports.createOrder = async (req, res) => {
   try {
     const { items, shippingAddress } = req.body;
-    
+
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Invalid items array' });
     }
@@ -54,13 +51,10 @@ router.post('/', auth, async (req, res) => {
     let total = 0;
     const orderItems = [];
 
-    // Verify products and calculate total
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (!product) {
-        return res.status(404).json({ 
-          error: `Product not found: ${item.productId}` 
-        });
+        return res.status(404).json({ error: `Product not found: ${item.productId}` });
       }
 
       total += product.price * item.quantity;
@@ -93,12 +87,12 @@ router.post('/', auth, async (req, res) => {
     console.error('Error creating order:', error);
     res.status(500).json({ error: 'Error creating order' });
   }
-});
+};
 
-router.delete('/:id', auth, async (req, res) => {
+exports.deleteOrder = async (req, res) => {
   try {
-    console.log('Delete request from user:', req.user);  
-    
+    console.log('Delete request from user:', req.user);
+
     const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
@@ -119,16 +113,16 @@ router.delete('/:id', auth, async (req, res) => {
     res.status(200).json({ message: 'Order deleted successfully' });
   } catch (error) {
     console.error('Delete order error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error deleting order',
-      error: error.message 
+      error: error.message
     });
   }
-});
+};
 
-router.patch('/:id/status', auth, async (req, res) => {
+exports.updateOrderStatus = async (req, res) => {
   try {
-    console.log('Update status request from user:', req.user); 
+    console.log('Update status request from user:', req.user);
 
     if (req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Admin access required' });
@@ -158,11 +152,9 @@ router.patch('/:id/status', auth, async (req, res) => {
     });
   } catch (error) {
     console.error('Status update error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       message: 'Error updating order status',
-      error: error.message 
+      error: error.message
     });
   }
-});
-
-module.exports = router;
+};
