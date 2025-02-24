@@ -64,6 +64,31 @@ Authorization: Bearer <token>
 }
 ```
 
+#### Get User Profile
+- **GET** `/api/users/profile`
+- Protected
+- Returns user profile information (excluding password)
+- **Response:**
+```json
+{
+  "username": "string",
+  "email": "string",
+  "createdAt": "string"
+}
+```
+
+#### Update User Profile
+- **PUT** `/api/users/profile`
+- Protected
+- **Body:**
+```json
+{
+  "username": "string",
+  "email": "string",
+  "password": "string"
+}
+```
+
 ### Products
 #### Get All Products
 - **GET** `/api/products`
@@ -159,4 +184,3 @@ All endpoints return error responses in the following format:
 - 403: Forbidden
 - 404: Not Found
 - 500: Server Error
-````

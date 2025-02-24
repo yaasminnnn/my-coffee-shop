@@ -68,3 +68,45 @@ exports.login = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const { email, username } = req.body;
+    
+    if (email) {
+      const emailExists = await User.findOne({ email, _id: { $ne: req.user.id } });
+      if (emailExists) {
+        return res.status(400).json({ error: 'Email already in use' });
+      }
+    }
+
+    if (username) {
+      const usernameExists = await User.findOne({ username, _id: { $ne: req.user.id } });
+      if (usernameExists) {
+        return res.status(400).json({ error: 'Username already taken' });
+      }
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { email, username } },
+      { new: true }
+    ).select('-password');
+
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+};
